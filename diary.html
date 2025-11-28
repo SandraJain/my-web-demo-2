@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>覆盤流程 Demo（第三個系統功能）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "Segoe UI", sans-serif;
+      background: #e3edf7;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 8px;
+    }
+
+    /* Phone frame */
+    .phone {
+      width: 360px;
+      max-width: 100%;
+      background: #f7f9fb;
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      position: relative;
+      height: 760px;
+
+      --primary-blue: #4a9fe6;
+      --primary-blue-dark: #2f6ca0;
+      --secondary-light-blue: #e8f4fb;
+      --secondary-gray-blue: #7a8fa3;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-light: #999999;
+      --bg-body: #f7f9fb;
+      --bg-card: #ffffff;
+      --dark-panel: #111821;
+      --dark-panel-soft: #1c2633;
+      --accent-pink: #01319d;
+      --accent-green: #1bc47d;
+    }
+
+    .status-bar {
+      height: 18px;
+      background: #000;
+      opacity: 0.9;
+    }
+
+    .app-header {
+      background: linear-gradient(180deg, var(--primary-blue-dark), var(--primary-blue));
+      padding: 8px 12px 10px;
+      color: #fff;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .header-icon-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Market tabs */
+    .market-tabs {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .market-tab {
+      flex: 0 0 auto;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.18);
+      color: #eaf4ff;
+      white-space: nowrap;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .market-tab.active {
+      background: #ffffff;
+      color: var(--primary-blue-dark);
+      border-color: rgba(0, 0, 0, 0.06);
+      font-weight: 600;
+    }
+
+    .app-body {
+      background: var(--bg-body);
+      padding: 8px 10px 60px;
+      height: calc(100% - 18px - 58px);
+      overflow-y: auto;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100%;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* --- 首頁（與前兩個系統相同） --- */
+    .asset-card {
+      background: var(--accent-pink);
+      color: #fff;
+      border-radius: 10px 10px 6px 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .asset-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .asset-header span {
+      font-weight: 600;
+    }
+
+    .dots {
+      letter-spacing: 3px;
+      font-size: 16px;
+    }
+
+    .asset-lines {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .dark-panel {
+      background: var(--dark-panel);
+      border-radius: 8px;
+      padding: 10px 10px 12px;
+      color: #d3d9e3;
+      margin-bottom: 10px;
+    }
+
+    .calendar-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .calendar-day {
+      flex: 1;
+      text-align: center;
+      padding: 4px 0;
+      border-radius: 5px;
+      margin: 0 1px;
+      cursor: pointer;
+    }
+
+    .calendar-day.active {
+      background: var(--secondary-light-blue);
+      color: #111821;
+      font-weight: 600;
+    }
+
+    .calendar-info {
+      background: var(--dark-panel-soft);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #c4ceda;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 4px 0 4px;
+      padding: 0 2px;
+    }
+
+    .section-header strong {
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    .section-header a {
+      text-decoration: none;
+      color: var(--primary-blue-dark);
+      font-size: 11px;
+    }
+
+    .feature-grid {
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 8px 4px 4px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-row-gap: 10px;
+      font-size: 11px;
+    }
+
+    .feature-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 4px 2px;
+      cursor: pointer;
+    }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--secondary-light-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+      font-size: 16px;
+      color: var(--primary-blue-dark);
+    }
+
+    .feature-label {
+      line-height: 1.3;
+    }
+
+    .market-summary {
+      margin-top: 10px;
+      background: var(--dark-panel);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 11px;
+      color: #d3d9e3;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .market-col {
+      flex: 1;
+      text-align: center;
+    }
+
+    .market-col-title {
+      margin-bottom: 3px;
+    }
+
+    .market-value {
+      color: #ffffff;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .market-change {
+      font-size: 10px;
+    }
+
+    .market-change.up {
+      color: #27a65b;
+    }
+
+    .market-change.down {
+      color: #e55252;
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 52px;
+      background: #ffffff;
+      border-top: 1px solid #dde3ec;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-secondary);
+    }
+
+    .nav-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    .nav-item.active {
+      color: var(--primary-blue-dark);
+      font-weight: 600;
+    }
+
+    .nav-item.active .nav-icon {
+      border-color: var(--primary-blue-dark);
+      background: var(--secondary-light-blue);
+    }
+
+    /* ------- 第二介面：覆盤首頁 ------- */
+    .screen-review-home {
+      padding: 14px 6px 80px;
+    }
+
+    .review-card-shell {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 18px 14px 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .review-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 4px;
+      color: #111a2a;
+    }
+
+    .review-subtitle {
+      font-size: 13px;
+      color: var(--secondary-gray-blue);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .review-item {
+      background: #f5f8ff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      border: 1px solid #d7e2f4;
+    }
+
+    .review-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--secondary-light-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--primary-blue-dark);
+      flex-shrink: 0;
+    }
+
+    .review-text {
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .review-btn-main {
+      margin-top: 16px;
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary-blue-dark);
+      color: #f5f7fb;
+      padding: 10px 0;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .review-btn-main:hover {
+      background: var(--primary-blue);
+    }
+
+    /* ------- 第三介面：所有股票總覽 ------- */
+    .screen-stock-list {
+      padding: 10px 2px 80px;
+    }
+
+    .list-header-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 0 4px;
+    }
+
+    .back-arrow {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid #d0d7e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 6px;
+      cursor: pointer;
+      background: #ffffff;
+      font-size: 16px;
+      color: #44516a;
+    }
+
+    .list-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1b2433;
+    }
+
+    .stock-list-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 8px 8px 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      margin-top: 4px;
+    }
+
+    .stock-header {
+      display: grid;
+      grid-template-columns: 50px 70px 40px 60px 60px;
+      font-size: 11px;
+      color: var(--secondary-gray-blue);
+      padding: 4px 4px 6px;
+      border-bottom: 1px solid #e1e7f0;
+    }
+
+    .stock-row {
+      display: grid;
+      grid-template-columns: 50px 70px 40px 60px 60px;
+      font-size: 12px;
+      padding: 6px 4px;
+      align-items: center;
+      border-bottom: 1px solid #f0f3f9;
+      cursor: pointer;
+    }
+
+    .stock-row:last-child {
+      border-bottom: none;
+    }
+
+    .stock-op {
+      color: var(--primary-blue-dark);
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .stock-name {
+      font-weight: 600;
+      color: #1b2433;
+    }
+
+    .stock-type {
+      color: var(--secondary-gray-blue);
+    }
+
+    .stock-num,
+    .stock-cost,
+    .stock-amt {
+      text-align: right;
+      font-family: "Roboto Mono", monospace;
+    }
+
+    .stock-amt {
+      font-weight: 600;
+      color: #1b2433;
+    }
+
+    /* ------- 第四介面：單一股票細節（覆盤表單） ------- */
+    .screen-stock-detail {
+      padding: 10px 8px 80px;
+      background: #05070b;
+      color: #f5f7fb;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .detail-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-arrow-dark {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid #343848;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: #11141b;
+      font-size: 15px;
+      color: #e1e6ff;
+    }
+
+    .detail-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .btn-save {
+      border: none;
+      background: transparent;
+      color: var(--accent-green);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .detail-card {
+      background: #11141b;
+      border-radius: 12px;
+      padding: 10px 10px 14px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .form-section-label {
+      font-size: 11px;
+      color: #8a91a5;
+      margin: 8px 0 4px;
+    }
+
+    .input-text {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #293043;
+      background: #181c24;
+      color: #f5f7fb;
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+
+    .input-text:focus {
+      outline: none;
+      border-color: var(--accent-green);
+    }
+
+    .form-row-inline {
+      display: flex;
+      gap: 8px;
+    }
+
+    .form-row-inline .form-col {
+      flex: 1;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+    }
+
+    /* iOS-style toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #3b4254;
+      transition: 0.2s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+
+    .switch input:checked + .slider {
+      background-color: var(--accent-green);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .select-field {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #293043;
+      background: #181c24;
+      color: #f5f7fb;
+      padding: 6px 8px;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .select-field:focus {
+      outline: none;
+      border-color: var(--accent-green);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="status-bar"></div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="header-title">
+          <div class="header-icon-circle">✉</div>
+          <span>帳務首頁</span>
+          <span>|</span>
+          <span>e點通</span>
+        </div>
+        <div class="header-actions">
+          <div class="header-icon-circle">🔔</div>
+          <div class="header-icon-circle">⚙</div>
+        </div>
+      </div>
+
+      <div class="market-tabs" id="marketTabs">
+        <div class="market-tab active">台股</div>
+        <div class="market-tab">海外股市</div>
+        <div class="market-tab">期權</div>
+        <div class="market-tab">國外期貨</div>
+        <div class="market-tab">基金</div>
+      </div>
+    </header>
+
+    <!-- Body -->
+    <main class="app-body">
+      <!-- 第一介面：首頁（由「對帳單」進入覆盤流程） -->
+      <section id="screenHome" class="screen active">
+        <section class="asset-card">
+          <div class="asset-header">
+            <span>我的資產</span>
+            <span class="dots">•••</span>
+          </div>
+          <div class="asset-lines">
+            <div>資產總現值 (NTD)</div>
+            <div>戶頭餘額 (NTD)</div>
+          </div>
+        </section>
+
+        <section class="dark-panel">
+          <div class="calendar-row" id="calendarRow">
+            <div class="calendar-day active">
+              <div>週一</div>
+              <div>25</div>
+            </div>
+            <div class="calendar-day">
+              <div>週二</div>
+              <div>26</div>
+            </div>
+            <div class="calendar-day">
+              <div>週三</div>
+              <div>27</div>
+            </div>
+            <div class="calendar-day">
+              <div>週四</div>
+              <div>28</div>
+            </div>
+            <div class="calendar-day">
+              <div>週五</div>
+              <div>29</div>
+            </div>
+          </div>
+          <div class="calendar-info">
+            法說會、重大公告、ETF 調整、投資展望等資訊示意文字⋯⋯
+          </div>
+        </section>
+
+        <div class="section-header">
+          <strong>常用功能</strong>
+          <a href="#">更多 &gt;</a>
+        </div>
+
+        <section class="feature-grid">
+          <div class="feature-item">
+            <div class="feature-icon">💰</div>
+            <div class="feature-label">台股下單</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🌎</div>
+            <div class="feature-label">海外股票</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <div class="feature-label">行情報價</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📈</div>
+            <div class="feature-label">ETF 導覽</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🔍</div>
+            <div class="feature-label">自選追蹤</div>
+          </div>
+
+          <!-- ⭐ 覆盤日記：連結第三個系統功能流程 -->
+          <div class="feature-item" id="btnStatement">
+            <div class="feature-icon">🧾</div>
+            <div class="feature-label">覆盤日記</div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">❤️</div>
+            <div class="feature-label">心理測驗</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">⚙</div>
+            <div class="feature-label">更多功能</div>
+          </div>
+        </section>
+
+        <section class="market-summary">
+          <div class="market-col">
+            <div class="market-col-title">加權</div>
+            <div class="market-value">21536.67</div>
+            <div class="market-change up">+115.87 (+0.54%)</div>
+          </div>
+          <div class="market-col">
+            <div class="market-col-title">櫃買</div>
+            <div class="market-value">227.67</div>
+            <div class="market-change up">+1.12 (+0.49%)</div>
+          </div>
+          <div class="market-col">
+            <div class="market-col-title">台指期</div>
+            <div class="market-value">21396</div>
+            <div class="market-change down">-89 (-0.41%)</div>
+          </div>
+        </section>
+      </section>
+
+      <!-- 第二介面：覆盤首頁 -->
+      <section id="screenReviewHome" class="screen screen-review-home">
+        <div class="review-card-shell">
+          <div class="review-title">覆盤首頁</div>
+          <div class="review-subtitle">打造屬於你的投資檔案</div>
+
+          <div class="review-item">
+            <div class="review-icon">🎯</div>
+            <div class="review-text">設定進出場條件</div>
+          </div>
+          <div class="review-item">
+            <div class="review-icon">📝</div>
+            <div class="review-text">寫入持股與定存明細</div>
+          </div>
+          <div class="review-item">
+            <div class="review-icon">📘</div>
+            <div class="review-text">填寫進出場紀錄</div>
+          </div>
+          <div class="review-item">
+            <div class="review-icon">📊</div>
+            <div class="review-text">查看紀錄與統計</div>
+          </div>
+
+          <button class="review-btn-main" id="btnStartReview">開始覆盤</button>
+        </div>
+      </section>
+
+      <!-- 第三介面：所有股票總覽 -->
+      <section id="screenStockList" class="screen screen-stock-list">
+        <div class="list-header-row">
+          <div class="back-arrow" id="backFromList">‹</div>
+          <div class="list-title">持股總覽</div>
+        </div>
+
+        <div class="stock-list-card">
+          <div class="stock-header">
+            <div>操作</div>
+            <div>商品</div>
+            <div>類別</div>
+            <div style="text-align:right;">股數</div>
+            <div style="text-align:right;">成本價</div>
+          </div>
+
+          <!-- 台積電這列：點擊會進到第四介面 -->
+          <div class="stock-row" id="rowTSMC">
+            <div class="stock-op">下單</div>
+            <div class="stock-name">台積電</div>
+            <div class="stock-type">現股</div>
+            <div class="stock-num">630</div>
+            <div class="stock-cost">598.0</div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-op">下單</div>
+            <div class="stock-name">聯發科</div>
+            <div class="stock-type">現股</div>
+            <div class="stock-num">120</div>
+            <div class="stock-cost">780.5</div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-op">下單</div>
+            <div class="stock-name">中華電</div>
+            <div class="stock-type">現股</div>
+            <div class="stock-num">300</div>
+            <div class="stock-cost">93.2</div>
+          </div>
+
+          <div class="stock-row">
+            <div class="stock-op">下單</div>
+            <div class="stock-name">長榮</div>
+            <div class="stock-type">現股</div>
+            <div class="stock-num">200</div>
+            <div class="stock-cost">140.0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 第四介面：台積電覆盤表單 -->
+      <section id="screenStockDetail" class="screen screen-stock-detail">
+        <div class="detail-header">
+          <div class="detail-header-left">
+            <div class="back-arrow-dark" id="backFromDetail">‹</div>
+            <div class="detail-title">總覽交易紀錄</div>
+          </div>
+          <button class="btn-save" id="btnSave">儲存</button>
+        </div>
+
+        <div class="detail-card">
+          <div class="form-section-label">標的</div>
+          <input class="input-text" type="text" value="台積電" />
+
+          <div class="form-section-label">交易時間</div>
+          <input class="input-text" type="text" value="2024/03/06 上午 09:20" />
+
+          <div class="form-section-label">出場時間</div>
+          <input class="input-text" type="text" value="2024/03/18 上午 10:45" />
+
+          <div class="form-section-label">價格</div>
+          <div class="form-row-inline">
+            <div class="form-col">
+              <input class="input-text" type="text" value="630" placeholder="進場價" />
+            </div>
+            <div class="form-col">
+              <input class="input-text" type="text" value="685" placeholder="出場價" />
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-label">設置停損並確實執行</div>
+            <label class="switch">
+              <input type="checkbox" id="toggleStopLoss" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="form-section-label">1. 進場原因：</div>
+          <select class="select-field">
+            <option>技術指標出現買訊（均線、KD、MACD 等）</option>
+            <option>基本面轉好：獲利成長、產業展望佳</option>
+            <option>重大利多消息或題材發酵</option>
+            <option>長期定期定額或既定存股計畫</option>
+          </select>
+
+          <div class="form-section-label">2. 出場原因：</div>
+          <select class="select-field">
+            <option>股價達到預先設定的目標價</option>
+            <option>跌破停損價或重要均線</option>
+            <option>基本面惡化或產業轉弱</option>
+            <option>資金調度、需要抽回部分資金</option>
+          </select>
+
+          <div class="form-section-label">3. 執行你的交易策略 Y/N：</div>
+          <select class="select-field">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav" id="bottomNav">
+      <div class="nav-item active">
+        <div class="nav-icon">🏠</div>
+        <div>首頁</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">⭐</div>
+        <div>自選</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">💹</div>
+        <div>下單</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">📄</div>
+        <div>帳務</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">⋯</div>
+        <div>更多</div>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    // 首頁：對帳單 → 覆盤首頁
+    document.getElementById("btnStatement").addEventListener("click", () => {
+      showScreen("screenReviewHome");
+    });
+
+    // 覆盤首頁：開始覆盤 → 持股總覽
+    document.getElementById("btnStartReview").addEventListener("click", () => {
+      showScreen("screenStockList");
+    });
+
+    // 持股總覽：返回覆盤首頁
+    document.getElementById("backFromList").addEventListener("click", () => {
+      showScreen("screenReviewHome");
+    });
+
+    // 持股總覽：點選台積電 → 詳細覆盤表單
+    document.getElementById("rowTSMC").addEventListener("click", () => {
+      showScreen("screenStockDetail");
+    });
+
+    // 詳細覆盤：返回持股總覽
+    document.getElementById("backFromDetail").addEventListener("click", () => {
+      showScreen("screenStockList");
+    });
+
+    // 儲存 → 回到第一個介面（首頁）
+    document.getElementById("btnSave").addEventListener("click", () => {
+      showScreen("screenHome");
+    });
+
+    // 行事曆點選效果
+    document.getElementById("calendarRow").addEventListener("click", function (e) {
+      const day = e.target.closest(".calendar-day");
+      if (!day) return;
+      this.querySelectorAll(".calendar-day").forEach(d => d.classList.remove("active"));
+      day.classList.add("active");
+    });
+
+    // Header tabs 高亮
+    document.getElementById("marketTabs").addEventListener("click", function (e) {
+      const tab = e.target.closest(".market-tab");
+      if (!tab) return;
+      this.querySelectorAll(".market-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+    });
+
+    // 底部 nav 高亮（視覺用）
+    document.getElementById("bottomNav").addEventListener("click", function (e) {
+      const item = e.target.closest(".nav-item");
+      if (!item) return;
+      this.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+    });
+  </script>
+</body>
+</html>
