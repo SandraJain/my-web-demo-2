@@ -300,6 +300,107 @@
     .market-change.down {
       color: #e55252;
     }
+    /* 🔹 AI 聊天室區塊樣式（新增） */
+    .ai-section {
+      margin-top: 10px;
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #e1e8f2;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .ai-bot-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e3f3ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .ai-header-text-small {
+      font-size: 12px;
+      color: #2f6ca0;
+      font-weight: 700;
+    }
+
+    .ai-header-text-main {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111;
+      margin-top: 2px;
+    }
+
+    .ai-chat-box {
+      background: #f5f8fc;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .ai-bubble {
+      padding: 6px 8px;
+      border-radius: 12px;
+      max-width: 80%;
+      line-height: 1.4;
+    }
+
+    .ai-bubble.bot {
+      background: #ffffff;
+      border: 1px solid #d6e2f0;
+      align-self: flex-start;
+    }
+
+    .ai-bubble.user {
+      background: #4a9fe6;
+      color: #fff;
+      align-self: flex-end;
+    }
+
+    .ai-input-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .ai-input-row input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid #d6e2f0;
+      padding: 6px 10px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .ai-input-row button {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #4a9fe6;
+      color: #fff;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
 
     /* Bottom nav */
     .bottom-nav {
@@ -798,6 +899,21 @@
             <div class="market-change down">-89 (-0.41%)</div>
           </div>
         </section>
+         <!-- 🔹 AI 聊天機器人區塊（放在原本空白處） -->
+        <section class="ai-section">
+          <div class="ai-header">
+            <div class="ai-bot-icon">🤖</div>
+            <div>
+              <div class="ai-header-text-small">AI 邦寶Q</div>
+            </div>
+          </div>
+
+          <div class="ai-input-row">
+            <input type="text" placeholder="試著問問：幫我整理本週持股重點…" />
+            <button type="button">送出</button>
+          </div>
+        </section>
+      </section>
       </section>
 
       <!-- 第二介面：覆盤首頁 -->
@@ -848,32 +964,32 @@
             <div class="stock-op">下單</div>
             <div class="stock-name">台積電</div>
             <div class="stock-type">現股</div>
-            <div class="stock-num">630</div>
-            <div class="stock-cost">598.0</div>
+            <div class="stock-num">2000</div>
+            <div class="stock-cost">1450</div>
           </div>
 
           <div class="stock-row">
             <div class="stock-op">下單</div>
             <div class="stock-name">聯發科</div>
             <div class="stock-type">現股</div>
-            <div class="stock-num">120</div>
-            <div class="stock-cost">780.5</div>
+            <div class="stock-num">1000</div>
+            <div class="stock-cost">1300</div>
           </div>
 
           <div class="stock-row">
             <div class="stock-op">下單</div>
             <div class="stock-name">中華電</div>
             <div class="stock-type">現股</div>
-            <div class="stock-num">300</div>
-            <div class="stock-cost">93.2</div>
+            <div class="stock-num">4000</div>
+            <div class="stock-cost">130</div>
           </div>
 
           <div class="stock-row">
             <div class="stock-op">下單</div>
             <div class="stock-name">長榮</div>
             <div class="stock-type">現股</div>
-            <div class="stock-num">200</div>
-            <div class="stock-cost">140.0</div>
+            <div class="stock-num">1000</div>
+            <div class="stock-cost">180</div>
           </div>
         </div>
       </section>
@@ -893,18 +1009,18 @@
           <input class="input-text" type="text" value="台積電" />
 
           <div class="form-section-label">交易時間</div>
-          <input class="input-text" type="text" value="2024/03/06 上午 09:20" />
+          <input class="input-text" type="text" value="2025/11/28 上午 09:20" />
 
           <div class="form-section-label">出場時間</div>
-          <input class="input-text" type="text" value="2024/03/18 上午 10:45" />
+          <input class="input-text" type="text" value="2025/12/03 上午 10:45" />
 
           <div class="form-section-label">價格</div>
           <div class="form-row-inline">
             <div class="form-col">
-              <input class="input-text" type="text" value="630" placeholder="進場價" />
+              <input class="input-text" type="text" value="1000" placeholder="進場價" />
             </div>
             <div class="form-col">
-              <input class="input-text" type="text" value="685" placeholder="出場價" />
+              <input class="input-text" type="text" value="1400" placeholder="出場價" />
             </div>
           </div>
 
